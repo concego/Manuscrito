@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manuscrito - Estúdio de Publicação Portátil</title>
+    <style>
+        /* --- ESTILOS DO APP (O que você vê na tela do celular) --- */
+        body { font-family: sans-serif; background-color: #121212; color: #ffffff; padding: 15px; margin: 0; }
+        main { max-width: 700px; margin: 0 auto; }
+        header { border-bottom: 2px solid #333; margin-bottom: 20px; }
+        h1 { font-size: 1.8rem; margin: 0 0 5px 0; color: #00ffcc; }
+        .secao { background: #1e1e1e; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; }
+        .secao h2, .secao h3 { margin-top: 0; font-size: 1.2rem; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; }
+        select, button, .btn-upload { width: 100%; background: #00ffcc; color: #000; border: none; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; text-align: center; box-sizing: border-box; }
+        select { background: #333; color: #fff; border: 2px solid #555; }
+        .btn-upload { background: #ffaa00; display: inline-block; }
+        .input-escondido { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+        
+        /* Campo de Texto de colagem rápida */
+        textarea { width: 100%; height: 120px; background-color: #2a2a2a; color: #ffffff; border: 2px solid #444; border-radius: 6px; padding: 10px; box-sizing: border-box; font-size: 1rem; margin-bottom: 10px; resize: vertical; }
+        textarea:focus { outline: 3px solid #00ffcc; }
+        .btn-adicionar-texto { background: #00ffcc; color: #000; margin-bottom: 5px; }
+
+        /* Lista de Arquivos Carregados */
+        .lista-manuscrito { list-style: none; padding: 0; margin: 15px 0; }
+        .item-componente { background: #2a2a2a; padding: 12px; margin-bottom: 10px; border-radius: 6px; border-left: 5px solid #00ffcc; }
+        .item-componente.tipo-imagem { border-left-color: #ffaa00; }
+        .item-titulo { font-weight: bold; margin-bottom: 8px; display: block; }
+        .controles-item { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .controles-item button { width: auto; flex-grow: 1; padding: 6px 10px; font-size: 0.85rem; background: #444; color: #fff; }
+        .controles-item button:focus, select:focus, button:focus { outline: 3px solid #00ffcc; }
+        
+        .btn-gerar { background: #00ffcc; color: #000; font-size: 1.2rem; margin-top: 15px; margin-bottom: 30px; }
+
+        /* --- ESTILOS DE EXPORTAÇÃO (O que vai para o PDF do livro) --- */
+        @media print {
+            body { background: #fff !important; color: #000 !important; padding: 0; }
+            main, .secao, .controles-item, button, label, select, header, h1, .btn-upload, textarea { display: none !important; } /* Esconde o app */
+            #area-impressao { display: block !important; } /* Mostra só o livro */
+            
+            /* Configurações de Quebra de Página Nativas */
+            .folha-capitulo { page-break-after: always; break-after: page; }
+            
+            /* --- TEMPLATES INJETADOS VIA CSS --- */
+            .template-cronicas { font-family: Georgia, serif; line-height: 1.6; text-align: left; }
+            .template-cronicas p { text-indent: 2em; margin: 0 0 10px 0; }
+            .template-cronicas h2 { text-align: center; font-size: 1.8rem; margin-top: 40px; }
+            
+            .template-academico { font-family: "Times New Roman", Times, serif; line-height: 1.5; text-align: justify; }
+            .template-academico p { text-indent: 1.5cm; margin: 0 0 12px 0; }
+            
+            .template-poesia { font-family: "Courier New", Courier, monospace; line-height: 1.4; }
+            .template-poesia .bloco-texto { max-width: 60%; margin: 0 auto; white-space: pre-line; padding-top: 10%; }
+
+            /* --- REGRAS DE POSICIONAMENTO DAS FOTOS --- */
+            .foto-bloco { display: block; width: 100%; max-height: 90vh; object-fit: contain; margin: 20px 0; page-break-inside: avoid; }
+            .foto-esquerda { float: left; width: 40%; margin: 0 20px 20px 0; page-break-inside: avoid; }
+            .foto-direita { float: right; width: 40%; margin: 0 0 20px 20px; page-break-inside: avoid; }
+            .limpar-fluxo { clear: both; }
+        }
+        #area-impressao { display: none; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <!-- Cabeçalho do App com Nome e Créditos -->
+        <header>
+            <h1>Manuscrito</h1>
+            <p style="font-size: 0.9rem; color: #aaa; margin: 0 0 15px 0;">
+                Estúdio de Publicação Portátil • Desenvolvido por <strong>Anderson Carvalho</strong>
+            </p>
+        </header>
+
+        <!-- Passo 1: Seleção de Template -->
+        <div class="secao">
+            <label for="seletor-template">1. Escolha o estilo da sua obra:</label>
+            <select id="seletor-template">
+                <option value="template-cronicas">Template: Crônicas e Histórias (Letra Serifada, Parágrafo com Recuo)</option>
+                <option value="template-academico">Template: Trabalho Acadêmico (Normas ABNT, Times, 1.5)</option>
+                <option value="template-poesia">Template: Poesia (Fonte Monocromática, Centralizado na Folha)</option>
+            </select>
+        </div>
+
+        <!-- Passo 2: Alimentação do Conteúdo (Upload ou Texto Direto) -->
+        <div class="secao">
+            <h2>2. Adicionar Conteúdo</h2>
+            
+            <!-- Opção A: Carregar arquivo -->
+            <div style="margin-bottom: 20px;">
+                <label for="upload-multiplo" class="btn-upload">Carregar Arquivos (.txt, .md, .jpg, .png)</label>
+                <input type="file" id="upload-multiplo" class="input-escondido" multiple accept=".txt,.md,.jpg,.jpeg,.png">
+            </div>
+
+            <!-- Opção B: Colar Texto Direto -->
+            <div>
+                <label for="texto-direto">Ou cole um texto/capítulo diretamente aqui:</label>
+                <textarea id="texto-direto" placeholder="Cole seu texto copiado aqui..."></textarea>
+                <button id="btn-adicionar-texto" class="btn-adicionar-texto">Adicionar Texto Colado</button>
+            </div>
+        </div>
+
+        <!-- Passo 3: Mesa de Operação (Organização) -->
+        <div class="secao" aria-live="polite">
+            <h2>3. Sumário e Estrutura do Livro</h2>
+            <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 15px;">Ordene os elementos e ajuste o alinhamento das imagens abaixo:</p>
+            <ul id="lista-elementos" class="lista-manuscrito">
+                <!-- Itens carregados entram aqui via JS -->
+            </ul>
+        </div>
+
+        <!-- Guia de Ajuda Rápido para o Usuário -->
+        <div class="secao">
+            <h3>Como gerar seu PDF:</h3>
+            <ol style="padding-left: 20px; margin: 5px 0; line-height: 1.5; font-size: 0.95rem; color: #ccc;">
+                <li>Escolha o estilo visual no passo 1.</li>
+                <li>Suba ou cole seus textos e ilustrações no passo 2.</li>
+                <li>Organize a ordem final usando os botões "Subir" e "Descer".</li>
+                <li>Clique no botão "Compilar" abaixo e, na tela do sistema que abrir, selecione a opção <strong>Salvar como PDF</strong>.</li>
+            </ol>
+        </div>
+
+        <!-- Passo 4: Compilar -->
+        <button id="btn-compilar" class="btn-gerar">4. Compilar e Gerar PDF</button>
+    </main>
+
+    <!-- Área Oculta que só o menu de impressão/PDF do celular vai ler -->
+    <div id="area-impressao"></div>
+
+    <script>
+        // Array global que vai guardar a ordem dos nossos arquivos na memória do app
+        let componentesObra = [];
+        let contadorTextosVirtuais = 0;
+
+        const uploadMultiplo = document.getElementById('upload-multiplo');
+        const textoDireto = document.getElementById('texto-direto');
+        const btnAdicionarTexto = document.getElementById('btn-adicionar-texto');
+        const listaElementos = document.getElementById('lista-elementos');
+        const btnCompilar = document.getElementById('btn-compilar');
+        const seletorTemplate = document.getElementById('seletor-template');
+        const areaImpressao = document.getElementById('area-impressao');
+
+        // Escuta o upload múltiplo de arquivos do sistema
+        uploadMultiplo.addEventListener('change', async function(evento) {
+            const arquivos = Array.from(evento.target.files);
+            
+            for (let arquivo of arquivos) {
+                const eImagem = arquivo.type.startsWith('image/');
+                const componente = {
+                    id: crypto.randomUUID(),
+                    nome: arquivo.name,
+                    tipo: eImagem ? 'imagem' : 'texto',
+                    conteudo: '',
+                    alinhamento: 'foto-bloco'
+                };
+
+                await new Promise((resolve) => {
+                    const leitor = new FileReader();
+                    leitor.onload = function(e) {
+                        componente.conteudo = e.target.result;
+                        componentesObra.push(componente);
+                        resolve();
+                    };
+                    
+                    if (eImagem) {
+                        leitor.readAsDataURL(arquivo);
+                    } else {
+                        leitor.readAsText(arquivo);
+                    }
+                });
+            }
+            
+            renderizarMesaDirecao();
+            alert(`${arquivos.length} arquivo(s) adicionado(s) com sucesso.`);
+        });
+
+        // Adiciona o texto que foi colado diretamente na caixa de texto
+        btnAdicionarTexto.addEventListener('click', function() {
+            const conteudo = textoDireto.value;
+            if (!conteudo.trim()) {
+                alert('A caixa de texto está vazia. Cole ou digite algo primeiro.');
+                return;
+            }
+
+            contadorTextosVirtuais++;
+            
+            // Cria um componente virtual idêntico ao de arquivo lido
+            const novoComponente = {
+                id: crypto.randomUUID(),
+                nome: `Texto Colado #${contadorTextosVirtuais}`,
+                tipo: 'texto',
+                conteudo: conteudo,
+                alinhamento: 'foto-bloco'
+            };
+
+            componentesObra.push(novoComponente);
+            textoDireto.value = ''; // Limpa a caixa para o próximo uso
+            
+            renderizarMesaDirecao();
+            alert('Texto colado adicionado com sucesso ao Sumário abaixo!');
+        });
+
+        // Desenha a interface da lista com os botões de controle acessíveis
+        function renderizarMesaDirecao() {
+            listaElementos.innerHTML = '';
+
+            if (componentesObra.length === 0) {
+                listaElementos.innerHTML = '<li style="color:#aaa;">Nenhum conteúdo adicionado ainda.</li>';
+                return;
+            }
+
+            componentesObra.forEach((comp, index) => {
+                const li = document.createElement('li');
+                li.className = `item-componente ${comp.tipo === 'imagem' ? 'tipo-imagem' : ''}`;
+                
+                const tipoTexto = comp.tipo === 'imagem' ? 'Imagem' : 'Texto do Capítulo';
+                
+                let HTMLControlesAdicionais = '';
+                if (comp.tipo === 'imagem') {
+                    HTMLControlesAdicionais = `
+                        <label for="alinhar-${comp.id}" style="font-size:0.8rem; margin-top:8px;">Posição da Foto:</label>
+                        <select id="alinhar-${comp.id}" onchange="atualizarAlinhamento('${comp.id}', this.value)">
+                            <option value="foto-bloco" ${comp.alinhamento === 'foto-bloco' ? 'selected' : ''}>Bloco Inteiro (Centralizado)</option>
+                            <option value="foto-esquerda" ${comp.alinhamento === 'foto-esquerda' ? 'selected' : ''}>Deslocar para a Esquerda (Texto contorna)</option>
+                            <option value="foto-direita" ${comp.alinhamento === 'foto-direita' ? 'selected' : ''}>Deslocar para a Direita (Texto contorna)</option>
+                        </select>
+                    `;
+                }
+
+                li.innerHTML = `
+                    <span class="item-titulo">[${tipoTexto}] ${comp.nome}</span>
+                    <div class="controles-item">
+                        <button onclick="moverItem(${index}, -1)" ${index === 0 ? 'disabled' : ''} aria-label="Mover ${comp.nome} para cima">Subir</button>
+                        <button onclick="moverItem(${index}, 1)" ${index === componentesObra.length - 1 ? 'disabled' : ''} aria-label="Mover ${comp.nome} para baixo">Descer</button>
+                        <button onclick="removerItem('${comp.id}')" style="background:#ff3333;" aria-label="Remover ${comp.nome}">Excluir</button>
+                    </div>
+                    ${HTMLControlesAdicionais}
+                `;
+                listaElementos.appendChild(li);
+            });
+        }
+
+        // Funções de controle da Mesa de Operação
+        window.moverItem = function(index, direcao) {
+            const novoIndex = index + direcao;
+            if (novoIndex < 0 || novoIndex >= componentesObra.length) return;
+            
+            const temp = componentesObra[index];
+            componentesObra[index] = componentesObra[novoIndex];
+            componentesObra[novoIndex] = temp;
+            
+            renderizarMesaDirecao();
+            
+            setTimeout(() => {
+                listaElementos.children[novoIndex].querySelector('button').focus();
+            }, 50);
+        };
+
+        window.removerItem = function(id) {
+            componentesObra = componentesObra.filter(c => c.id !== id);
+            renderizarMesaDirecao();
+        };
+
+        window.atualizarAlinhamento = function(id, valor) {
+            const comp = componentesObra.find(c => c.id === id);
+            if (comp) comp.alinhamento = valor;
+        };
+
+        // Compila os dados locais no formato do template e abre o gerenciador de PDF do celular
+        btnCompilar.addEventListener('click', function() {
+            if (componentesObra.length === 0) {
+                alert('Sua obra está vazia! Adicione capítulos ou imagens primeiro.');
+                return;
+            }
+
+            const templateEscolhido = seletorTemplate.value;
+            areaImpressao.innerHTML = '';
+            
+            const containerObra = document.createElement('div');
+            containerObra.className = templateEscolhido;
+
+            componentesObra.forEach(comp => {
+                const bloco = document.createElement('div');
+                bloco.className = 'folha-capitulo';
+
+                if (comp.tipo === 'texto') {
+                    const paragrafos = comp.conteudo.split('\n').filter(p => p.trim() !== '');
+                    let htmlFormatado = '';
+                    
+                    paragrafos.forEach(p => {
+                        let textoLimpo = p.replace(/^-\s*/gm, '— ');
+                        htmlFormatado += `<p>${textoLimpo}</p>`;
+                    });
+                    
+                    bloco.innerHTML = `<div class="bloco-texto">${htmlFormatado}</div>`;
+                } else if (comp.tipo === 'imagem') {
+                    bloco.innerHTML = `
+                        <img src="${comp.conteudo}" class="${comp.alinhamento}" alt="Ilustração inserida pelo autor">
+                        <div class="limpar-fluxo"></div>
+                    `;
+                }
+                containerObra.appendChild(bloco);
+            });
+
+            areaImpressao.appendChild(containerObra);
+            window.print();
+        });
+    </script>
+</body>
+</html>
