@@ -12,6 +12,8 @@
         h1 { font-size: 1.8rem; margin: 0 0 5px 0; color: #00ffcc; }
         .secao { background: #1e1e1e; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; }
         .secao h2, .secao h3 { margin-top: 0; font-size: 1.2rem; }
+        .grid-ajustes { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 10px; }
+        @media (min-width: 480px) { .grid-ajustes { grid-template-columns: 1fr 1fr; } }
         label { display: block; font-weight: bold; margin-bottom: 8px; }
         select, button, .btn-upload { width: 100%; background: #00ffcc; color: #000; border: none; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; text-align: center; box-sizing: border-box; }
         select { background: #333; color: #fff; border: 2px solid #555; }
@@ -32,18 +34,22 @@
         .controles-item button { width: auto; flex-grow: 1; padding: 6px 10px; font-size: 0.85rem; background: #444; color: #fff; }
         .controles-item button:focus, select:focus, button:focus { outline: 3px solid #00ffcc; }
         
-        .btn-gerar { background: #00ffcc; color: #000; font-size: 1.2rem; margin-top: 15px; margin-bottom: 30px; }
+        /* Container de Ações Finais Compacto */
+        .container-exportacao { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; margin-bottom: 40px; }
+        .btn-gerar { background: #00ffcc; color: #000; font-size: 1.2rem; }
+        .linha-salvar-como { display: flex; gap: 10px; align-items: flex-end; }
+        .linha-salvar-como > div { flex-grow: 1; }
+        .linha-salvar-como button { width: auto; min-width: 120px; background: #00ccff; }
 
         /* --- ESTILOS DE EXPORTAÇÃO (O que vai para o PDF do livro) --- */
         @media print {
-            body { background: #fff !important; color: #000 !important; padding: 0; }
-            main, .secao, .controles-item, button, label, select, header, h1, .btn-upload, textarea { display: none !important; } /* Esconde o app */
-            #area-impressao { display: block !important; } /* Mostra só o livro */
+            body { background: #fff !important; padding: 0; }
+            main, .secao, .controles-item, button, label, select, header, h1, .btn-upload, textarea, .container-exportacao { display: none !important; }
+            #area-impressao { display: block !important; }
             
-            /* Configurações de Quebra de Página Nativas */
             .folha-capitulo { page-break-after: always; break-after: page; }
             
-            /* --- TEMPLATES INJETADOS VIA CSS --- */
+            /* --- TEMPLATES --- */
             .template-cronicas { font-family: Georgia, serif; line-height: 1.6; text-align: left; }
             .template-cronicas p { text-indent: 2em; margin: 0 0 10px 0; }
             .template-cronicas h2 { text-align: center; font-size: 1.8rem; margin-top: 40px; }
@@ -54,7 +60,18 @@
             .template-poesia { font-family: "Courier New", Courier, monospace; line-height: 1.4; }
             .template-poesia .bloco-texto { max-width: 60%; margin: 0 auto; white-space: pre-line; padding-top: 10%; }
 
-            /* --- REGRAS DE POSICIONAMENTO DAS FOTOS --- */
+            .template-carta { font-family: Arial, sans-serif; line-height: 1.8; text-align: left; padding: 1cm; }
+            .template-carta p { margin: 0 0 15px 0; }
+
+            .template-relatorio { font-family: Calibri, sans-serif; line-height: 1.4; text-align: justify; }
+            .template-relatorio p { margin: 0 0 10px 0; }
+            .template-relatorio h2 { color: #111; border-bottom: 1px solid #666; padding-bottom: 4px; margin-top: 30px; }
+
+            .template-ata { font-family: Arial, Helvetica, sans-serif; line-height: 1.3; text-align: justify; }
+            .template-ata p { margin: 0 0 8px 0; text-indent: 0; }
+            .template-ata h2 { text-align: center; font-size: 1.4rem; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; }
+
+            /* --- FOTOS --- */
             .foto-bloco { display: block; width: 100%; max-height: 90vh; object-fit: contain; margin: 20px 0; page-break-inside: avoid; }
             .foto-esquerda { float: left; width: 40%; margin: 0 20px 20px 0; page-break-inside: avoid; }
             .foto-direita { float: right; width: 40%; margin: 0 0 20px 20px; page-break-inside: avoid; }
@@ -62,11 +79,11 @@
         }
         #area-impressao { display: none; }
     </style>
+    <style id="estilo-impressao-dinamico"></style>
 </head>
 <body>
 
     <main>
-        <!-- Cabeçalho do App com Nome e Créditos -->
         <header>
             <h1>Manuscrito</h1>
             <p style="font-size: 0.9rem; color: #aaa; margin: 0 0 15px 0;">
@@ -74,27 +91,58 @@
             </p>
         </header>
 
-        <!-- Passo 1: Seleção de Template -->
         <div class="secao">
-            <label for="seletor-template">1. Escolha o estilo da sua obra:</label>
-            <select id="seletor-template">
-                <option value="template-cronicas">Template: Crônicas e Histórias (Letra Serifada, Parágrafo com Recuo)</option>
-                <option value="template-academico">Template: Trabalho Acadêmico (Normas ABNT, Times, 1.5)</option>
-                <option value="template-poesia">Template: Poesia (Fonte Monocromática, Centralizado na Folha)</option>
-            </select>
+            <h2>1. Configurações do Documento</h2>
+            
+            <div class="grid-ajustes">
+                <div>
+                    <label for="seletor-template">Estilo da Obra:</label>
+                    <select id="seletor-template">
+                        <option value="template-cronicas">Crônicas e Histórias (Letra Serifada, Recuo)</option>
+                        <option value="template-academico">Trabalho Acadêmico (Normas ABNT)</option>
+                        <option value="template-poesia">Poesia (Fonte Espaçada, Centralizado)</option>
+                        <option value="template-carta">Carta / Documento Geral (Arial, Linhas Espaçadas)</option>
+                        <option value="template-relatorio">Relatório Técnico (Calibri, Títulos Marcados)</option>
+                        <option value="template-ata">Ata de Reunião (Arial, Compacto, Sem Recuo)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="ajuste-fonte">Tamanho da Fonte no PDF:</label>
+                    <select id="ajuste-fonte">
+                        <option value="12pt">Padrão (12pt)</option>
+                        <option value="14pt">Médio (14pt)</option>
+                        <option value="16pt">Grande (16pt)</option>
+                        <option value="18pt">Muito Grande (18pt)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="ajuste-papel">Tamanho do Papel:</label>
+                    <select id="ajuste-papel">
+                        <option value="A4">Papel A4</option>
+                        <option value="letter">Papel Carta (Letter)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="ajuste-cor">Tom do Texto Impresso:</label>
+                    <select id="ajuste-cor">
+                        <option value="#000000">Preto Puro (Alto Contraste)</option>
+                        <option value="#222222">Cinza Escuro (Leitura Confortável)</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
-        <!-- Passo 2: Alimentação do Conteúdo (Upload ou Texto Direto) -->
         <div class="secao">
             <h2>2. Adicionar Conteúdo</h2>
             
-            <!-- Opção A: Carregar arquivo -->
             <div style="margin-bottom: 20px;">
                 <label for="upload-multiplo" class="btn-upload">Carregar Arquivos (.txt, .md, .jpg, .png)</label>
                 <input type="file" id="upload-multiplo" class="input-escondido" multiple accept=".txt,.md,.jpg,.jpeg,.png">
             </div>
 
-            <!-- Opção B: Colar Texto Direto -->
             <div>
                 <label for="texto-direto">Ou cole um texto/capítulo diretamente aqui:</label>
                 <textarea id="texto-direto" placeholder="Cole seu texto copiado aqui..."></textarea>
@@ -102,35 +150,43 @@
             </div>
         </div>
 
-        <!-- Passo 3: Mesa de Operação (Organização) -->
         <div class="secao" aria-live="polite">
             <h2>3. Sumário e Estrutura do Livro</h2>
             <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 15px;">Ordene os elementos e ajuste o alinhamento das imagens abaixo:</p>
             <ul id="lista-elementos" class="lista-manuscrito">
-                <!-- Itens carregados entram aqui via JS -->
-            </ul>
+                </ul>
         </div>
 
-        <!-- Guia de Ajuda Rápido para o Usuário -->
         <div class="secao">
-            <h3>Como gerar seu PDF:</h3>
+            <h3>Como gerar ou exportar sua obra:</h3>
             <ol style="padding-left: 20px; margin: 5px 0; line-height: 1.5; font-size: 0.95rem; color: #ccc;">
-                <li>Escolha o estilo visual no passo 1.</li>
+                <li>Escolha o estilo e as configurações no passo 1.</li>
                 <li>Suba ou cole seus textos e ilustrações no passo 2.</li>
                 <li>Organize a ordem final usando os botões "Subir" e "Descer".</li>
-                <li>Clique no botão "Compilar" abaixo e, na tela do sistema que abrir, selecione a opção <strong>Salvar como PDF</strong>.</li>
+                <li>Use as opções abaixo para gerar seu arquivo PDF final ou salvar o arquivo consolidado em outros formatos.</li>
             </ol>
         </div>
 
-        <!-- Passo 4: Compilar -->
-        <button id="btn-compilar" class="btn-gerar">4. Compilar e Gerar PDF</button>
+        <div class="container-exportacao">
+            <button id="btn-compilar" class="btn-gerar">4. Compilar e Imprimir (PDF)</button>
+            
+            <div class="linha-salvar-como" style="border-top: 1px solid #333; padding-top: 15px;">
+                <div>
+                    <label for="seletor-formato-exportar">Salvar Como...</label>
+                    <select id="seletor-formato-exportar">
+                        <option value="txt">Texto Puro Universal (.txt)</option>
+                        <option value="md">Documento Markdown (.md)</option>
+                        <option value="html">Página Web Completa (.html)</option>
+                    </select>
+                </div>
+                <button id="btn-exportar-arquivo">Salvar</button>
+            </div>
+        </div>
     </main>
 
-    <!-- Área Oculta que só o menu de impressão/PDF do celular vai ler -->
     <div id="area-impressao"></div>
 
     <script>
-        // Array global que vai guardar a ordem dos nossos arquivos na memória do app
         let componentesObra = [];
         let contadorTextosVirtuais = 0;
 
@@ -139,8 +195,15 @@
         const btnAdicionarTexto = document.getElementById('btn-adicionar-texto');
         const listaElementos = document.getElementById('lista-elementos');
         const btnCompilar = document.getElementById('btn-compilar');
+        const btnExportarArquivo = document.getElementById('btn-exportar-arquivo');
+        const seletorFormatoExportar = document.getElementById('seletor-formato-exportar');
         const seletorTemplate = document.getElementById('seletor-template');
         const areaImpressao = document.getElementById('area-impressao');
+        
+        const ajusteFonte = document.getElementById('ajuste-fonte');
+        const ajustePapel = document.getElementById('ajuste-papel');
+        const ajusteCor = document.getElementById('ajuste-cor');
+        const estiloImpressaoDinamico = document.getElementById('estilo-impressao-dinamico');
 
         // Escuta o upload múltiplo de arquivos do sistema
         uploadMultiplo.addEventListener('change', async function(evento) {
@@ -186,7 +249,6 @@
 
             contadorTextosVirtuais++;
             
-            // Cria um componente virtual idêntico ao de arquivo lido
             const novoComponente = {
                 id: crypto.randomUUID(),
                 nome: `Texto Colado #${contadorTextosVirtuais}`,
@@ -196,7 +258,7 @@
             };
 
             componentesObra.push(novoComponente);
-            textoDireto.value = ''; // Limpa a caixa para o próximo uso
+            textoDireto.value = '';
             
             renderizarMesaDirecao();
             alert('Texto colado adicionado com sucesso ao Sumário abaixo!');
@@ -242,7 +304,6 @@
             });
         }
 
-        // Funções de controle da Mesa de Operação
         window.moverItem = function(index, direcao) {
             const novoIndex = index + direcao;
             if (novoIndex < 0 || novoIndex >= componentesObra.length) return;
@@ -268,16 +329,9 @@
             if (comp) comp.alinhamento = valor;
         };
 
-        // Compila os dados locais no formato do template e abre o gerenciador de PDF do celular
-        btnCompilar.addEventListener('click', function() {
-            if (componentesObra.length === 0) {
-                alert('Sua obra está vazia! Adicione capítulos ou imagens primeiro.');
-                return;
-            }
-
+        // Monta a estrutura da obra para exibição em tela de impressão
+        function construirHTMLObra() {
             const templateEscolhido = seletorTemplate.value;
-            areaImpressao.innerHTML = '';
-            
             const containerObra = document.createElement('div');
             containerObra.className = templateEscolhido;
 
@@ -303,9 +357,95 @@
                 }
                 containerObra.appendChild(bloco);
             });
+            return containerObra;
+        }
 
-            areaImpressao.appendChild(containerObra);
+        // Compila para a tela de impressão do PDF nativo
+        btnCompilar.addEventListener('click', function() {
+            if (componentesObra.length === 0) {
+                alert('Sua obra está vazia! Adicione capítulos ou imagens primeiro.');
+                return;
+            }
+
+            const tamanhoFonte = ajusteFonte.value;
+            const tamanhoPapel = ajustePapel.value;
+            const corTexto = ajusteCor.value;
+
+            estiloImpressaoDinamico.innerHTML = `
+                @media print {
+                    @page { size: ${tamanhoPapel}; margin: 20mm; }
+                    #area-impressao div { font-size: ${tamanhoFonte} !important; color: ${corTexto} !important; }
+                }
+            `;
+
+            areaImpressao.innerHTML = '';
+            areaImpressao.appendChild(construirHTMLObra());
             window.print();
+        });
+
+        // Função "Salvar Como..." Unificada
+        btnExportarArquivo.addEventListener('click', function() {
+            if (componentesObra.length === 0) {
+                alert('Adicione algum conteúdo antes de salvar.');
+                return;
+            }
+
+            const formato = seletorFormatoExportar.value;
+            let dadosSaida = '';
+            let tipoMime = 'text/plain';
+            let extensao = 'txt';
+
+            if (formato === 'txt') {
+                componentesObra.forEach(comp => {
+                    if (comp.tipo === 'texto') {
+                        dadosSaida += `${comp.conteudo}\n\n`;
+                    } else {
+                        dadosSaida += `[Imagem Omitida no TXT: ${comp.nome}]\n\n`;
+                    }
+                });
+            } else if (formato === 'md') {
+                extensao = 'md';
+                componentesObra.forEach(comp => {
+                    if (comp.tipo === 'texto') {
+                        dadosSaida += `## ${comp.nome.split('.')[0]}\n\n${comp.conteudo}\n\n`;
+                    } else {
+                        dadosSaida += `![${comp.nome}](Imagem Embutida Omitida no Markdown)\n\n`;
+                    }
+                });
+            } else if (formato === 'html') {
+                extensao = 'html';
+                tipoMime = 'text/html';
+                
+                const estilosAtuais = document.getElementsByTagName('style')[0].innerHTML;
+                const corpoConteudo = construirHTMLObra().innerHTML;
+                
+                dadosSaida = `
+                    <!DOCTYPE html>
+                    <html lang="pt-BR">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Obra Exportada - Manuscrito</title>
+                        <style>
+                            body { padding: 40px; background: #fff; color: #000; font-family: sans-serif; }
+                            .folha-capitulo { margin-bottom: 50px; border-bottom: 1px dashed #ccc; padding-bottom: 30px; }
+                            ${estilosAtuais.split('@media print')[1] || ''}
+                        </style>
+                    </head>
+                    <body>
+                        ${corpoConteudo}
+                    </body>
+                    </html>
+                `;
+            }
+
+            const blob = new Blob([dadosSaida], { type: `${tipoMime};charset=utf-8` });
+            const linkVirtual = document.createElement('a');
+            linkVirtual.href = URL.createObjectURL(blob);
+            linkVirtual.download = `obra_consolidada.${extensao}`;
+            
+            document.body.appendChild(linkVirtual);
+            linkVirtual.click();
+            document.body.removeChild(linkVirtual);
         });
     </script>
 </body>
