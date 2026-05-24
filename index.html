@@ -14,10 +14,11 @@
         .secao h2, .secao h3 { margin-top: 0; font-size: 1.2rem; }
         .grid-ajustes { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 10px; }
         @media (min-width: 480px) { .grid-ajustes { grid-template-columns: 1fr 1fr; } }
-        label { display: block; font-weight: bold; margin-bottom: 8px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; margin-top: 10px; }
         select, button, .btn-upload { width: 100%; background: #00ffcc; color: #000; border: none; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; text-align: center; box-sizing: border-box; }
         select { background: #333; color: #fff; border: 2px solid #555; }
         .btn-upload { background: #ffaa00; display: inline-block; }
+        .btn-limpar { background: #ff3333; color: #fff; padding: 6px 12px; width: auto; font-size: 0.9rem; float: right; margin-top: -5px; }
         .input-escondido { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
         
         /* Campo de Texto de colagem rápida */
@@ -26,20 +27,26 @@
         .btn-adicionar-texto { background: #00ffcc; color: #000; margin-bottom: 5px; }
 
         /* Lista de Arquivos Carregados */
-        .lista-manuscrito { list-style: none; padding: 0; margin: 15px 0; }
+        .lista-manuscrito { list-style: none; padding: 0; margin: 15px 0; clear: both; }
         .item-componente { background: #2a2a2a; padding: 12px; margin-bottom: 10px; border-radius: 6px; border-left: 5px solid #00ffcc; }
         .item-componente.tipo-imagem { border-left-color: #ffaa00; }
         .item-titulo { font-weight: bold; margin-bottom: 8px; display: block; }
         .controles-item { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
         .controles-item button { width: auto; flex-grow: 1; padding: 6px 10px; font-size: 0.85rem; background: #444; color: #fff; }
-        .controles-item button:focus, select:focus, button:focus { outline: 3px solid #00ffcc; }
+        .controles-item button:focus, select:focus, button:focus, input:focus { outline: 3px solid #00ffcc; }
         
+        /* Inputs de acessibilidade dentro do card */
+        .input-alt { width: 100%; background: #333; color: #fff; border: 1px solid #555; padding: 8px; border-radius: 4px; box-sizing: border-box; margin-top: 5px; }
+
         /* Container de Ações Finais Compacto */
         .container-exportacao { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; margin-bottom: 40px; }
         .btn-gerar { background: #00ffcc; color: #000; font-size: 1.2rem; }
         .linha-salvar-como { display: flex; gap: 10px; align-items: flex-end; }
         .linha-salvar-como > div { flex-grow: 1; }
         .linha-salvar-como button { width: auto; min-width: 120px; background: #00ccff; }
+
+        /* Visibilidade apenas para leitores de tela */
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
         /* --- ESTILOS DE EXPORTAÇÃO (O que vai para o PDF do livro) --- */
         @media print {
@@ -49,27 +56,34 @@
             
             .folha-capitulo { page-break-after: always; break-after: page; }
             
+            /* --- ESTILO DO SUMÁRIO NO PDF --- */
+            .pdf-sumario { font-family: Georgia, serif; padding: 2cm; page-break-after: always; break-after: page; }
+            .pdf-sumario h1 { text-align: center; color: #000; font-size: 2rem; margin-bottom: 40px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+            .pdf-sumario ul { list-style: none; padding: 0; }
+            .pdf-sumario li { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1.2rem; border-bottom: 1px dotted #ccc; }
+            .pdf-sumario li span { background: #fff; padding-right: 5px; }
+            .pdf-sumario li .num-pag { padding-left: 5px; background: #fff; border-bottom: none; font-weight: bold; }
+
             /* --- TEMPLATES --- */
             .template-cronicas { font-family: Georgia, serif; line-height: 1.6; text-align: left; }
             .template-cronicas p { text-indent: 2em; margin: 0 0 10px 0; }
-            .template-cronicas h2 { text-align: center; font-size: 1.8rem; margin-top: 40px; }
+            .template-cronicas h2 { text-align: center; font-size: 1.8rem; margin-top: 40px; margin-bottom: 20px; }
             
             .template-academico { font-family: "Times New Roman", Times, serif; line-height: 1.5; text-align: justify; }
             .template-academico p { text-indent: 1.5cm; margin: 0 0 12px 0; }
+            .template-academico h2 { font-size: 1.4rem; font-weight: bold; text-transform: uppercase; margin-top: 30px; margin-bottom: 15px; }
             
             .template-poesia { font-family: "Courier New", Courier, monospace; line-height: 1.4; }
             .template-poesia .bloco-texto { max-width: 60%; margin: 0 auto; white-space: pre-line; padding-top: 10%; }
+            .template-poesia h2 { text-align: center; font-size: 1.5rem; margin-bottom: 25px; }
 
             .template-carta { font-family: Arial, sans-serif; line-height: 1.8; text-align: left; padding: 1cm; }
             .template-carta p { margin: 0 0 15px 0; }
+            .template-carta h2 { font-size: 1.6rem; margin-top: 25px; }
 
             .template-relatorio { font-family: Calibri, sans-serif; line-height: 1.4; text-align: justify; }
             .template-relatorio p { margin: 0 0 10px 0; }
             .template-relatorio h2 { color: #111; border-bottom: 1px solid #666; padding-bottom: 4px; margin-top: 30px; }
-
-            .template-ata { font-family: Arial, Helvetica, sans-serif; line-height: 1.3; text-align: justify; }
-            .template-ata p { margin: 0 0 8px 0; text-indent: 0; }
-            .template-ata h2 { text-align: center; font-size: 1.4rem; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; }
 
             /* --- FOTOS --- */
             .foto-bloco { display: block; width: 100%; max-height: 90vh; object-fit: contain; margin: 20px 0; page-break-inside: avoid; }
@@ -91,6 +105,8 @@
             </p>
         </header>
 
+        <div id="alerta-acessivel" class="sr-only" aria-live="assertive"></div>
+
         <div class="secao">
             <h2>1. Configurações do Documento</h2>
             
@@ -103,7 +119,14 @@
                         <option value="template-poesia">Poesia (Fonte Espaçada, Centralizado)</option>
                         <option value="template-carta">Carta / Documento Geral (Arial, Linhas Espaçadas)</option>
                         <option value="template-relatorio">Relatório Técnico (Calibri, Títulos Marcados)</option>
-                        <option value="template-ata">Ata de Reunião (Arial, Compacto, Sem Recuo)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="ajuste-sumario-pdf">Gerar Índice no PDF:</label>
+                    <select id="ajuste-sumario-pdf">
+                        <option value="sim">Sim, criar página de sumário automaticamente</option>
+                        <option value="nao">Não criar página de sumário</option>
                     </select>
                 </div>
 
@@ -124,47 +147,31 @@
                         <option value="letter">Papel Carta (Letter)</option>
                     </select>
                 </div>
-
-                <div>
-                    <label for="ajuste-cor">Tom do Texto Impresso:</label>
-                    <select id="ajuste-cor">
-                        <option value="#000000">Preto Puro (Alto Contraste)</option>
-                        <option value="#222222">Cinza Escuro (Leitura Confortável)</option>
-                    </select>
-                </div>
             </div>
         </div>
 
         <div class="secao">
-            <h2>2. Adicionar Conteúdo</h2>
+            <h2>2. Adicionar Conteúdo / Carregar Backup</h2>
             
             <div style="margin-bottom: 20px;">
-                <label for="upload-multiplo" class="btn-upload">Carregar Arquivos (.txt, .md, .jpg, .png)</label>
-                <input type="file" id="upload-multiplo" class="input-escondido" multiple accept=".txt,.md,.jpg,.jpeg,.png">
+                <label for="upload-multiplo" class="btn-upload">Carregar Arquivos ou Backup (.txt, .md, .jpg, .json)</label>
+                <input type="file" id="upload-multiplo" class="input-escondido" multiple accept=".txt,.md,.jpg,.jpeg,.png,.json">
             </div>
 
             <div>
                 <label for="texto-direto">Ou cole um texto/capítulo diretamente aqui:</label>
-                <textarea id="texto-direto" placeholder="Cole seu texto copiado aqui..."></textarea>
+                <textarea id="texto-direto" placeholder="Dica: Comece a linha com # para criar um título de capítulo..."></textarea>
                 <button id="btn-adicionar-texto" class="btn-adicionar-texto">Adicionar Texto Colado</button>
             </div>
         </div>
 
-        <div class="secao" aria-live="polite">
-            <h2>3. Sumário e Estrutura do Livro</h2>
-            <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 15px;">Ordene os elementos e ajuste o alinhamento das imagens abaixo:</p>
-            <ul id="lista-elementos" class="lista-manuscrito">
-                </ul>
-        </div>
-
         <div class="secao">
-            <h3>Como gerar ou exportar sua obra:</h3>
-            <ol style="padding-left: 20px; margin: 5px 0; line-height: 1.5; font-size: 0.95rem; color: #ccc;">
-                <li>Escolha o estilo e as configurações no passo 1.</li>
-                <li>Suba ou cole seus textos e ilustrações no passo 2.</li>
-                <li>Organize a ordem final usando os botões "Subir" e "Descer".</li>
-                <li>Use as opções abaixo para gerar seu arquivo PDF final ou salvar o arquivo consolidado em outros formatos.</li>
-            </ol>
+            <button class="btn-limpar" onclick="limparMesaTrabalho()">Limpar Mesa</button>
+            <h2 id="titulo-sumario">3. Sumário e Estrutura do Livro</h2>
+            <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 15px;">Ordene os elementos e ajuste as opções das imagens abaixo:</p>
+            <ul id="lista-elementos" class="lista-manuscrito" aria-labelledby="titulo-sumario">
+                <li style="color:#aaa;">Nenhum conteúdo adicionado ainda.</li>
+            </ul>
         </div>
 
         <div class="container-exportacao">
@@ -177,6 +184,7 @@
                         <option value="txt">Texto Puro Universal (.txt)</option>
                         <option value="md">Documento Markdown (.md)</option>
                         <option value="html">Página Web Completa (.html)</option>
+                        <option value="json">Backup Completo da Mesa (.json)</option>
                     </select>
                 </div>
                 <button id="btn-exportar-arquivo">Salvar</button>
@@ -199,24 +207,56 @@
         const seletorFormatoExportar = document.getElementById('seletor-formato-exportar');
         const seletorTemplate = document.getElementById('seletor-template');
         const areaImpressao = document.getElementById('area-impressao');
+        const alertaAcessivel = document.getElementById('alerta-acessivel');
         
         const ajusteFonte = document.getElementById('ajuste-fonte');
         const ajustePapel = document.getElementById('ajuste-papel');
-        const ajusteCor = document.getElementById('ajuste-cor');
+        const ajusteSumarioPdf = document.getElementById('ajuste-sumario-pdf');
         const estiloImpressaoDinamico = document.getElementById('estilo-impressao-dinamico');
 
-        // Escuta o upload múltiplo de arquivos do sistema
+        function anunciarLeitor(mensagem) {
+            alertaAcessivel.textContent = message = mensagem;
+            setTimeout(() => { alertaAcessivel.textContent = ''; }, 3000);
+        }
+
+        // Escuta o upload múltiplo de arquivos do sistema (e backups JSON)
         uploadMultiplo.addEventListener('change', async function(evento) {
             const arquivos = Array.from(evento.target.files);
+            if(arquivos.length === 0) return;
             
+            let contadorNormais = 0;
+
             for (let arquivo of arquivos) {
+                // Se for um arquivo de backup JSON gerado pelo Manuscrito
+                if (arquivo.name.endsWith('.json')) {
+                    const leitorJson = new FileReader();
+                    leitorJson.onload = function(e) {
+                        try {
+                            const dadosImportados = JSON.parse(e.target.result);
+                            if (Array.isArray(dadosImportados)) {
+                                componentesObra = dadosImportados;
+                                renderizarMesaDirecao();
+                                anunciarLeitor("Backup completo da mesa restaurado com sucesso.");
+                            } else {
+                                anunciarLeitor("Erro: O arquivo JSON não parece ser um backup válido.");
+                            }
+                        } catch(err) {
+                            anunciarLeitor("Erro ao ler o arquivo de backup.");
+                        }
+                    };
+                    leitorJson.readAsText(arquivo);
+                    uploadMultiplo.value = '';
+                    return; 
+                }
+
                 const eImagem = arquivo.type.startsWith('image/');
                 const componente = {
                     id: crypto.randomUUID(),
                     nome: arquivo.name,
                     tipo: eImagem ? 'imagem' : 'texto',
                     conteudo: '',
-                    alinhamento: 'foto-bloco'
+                    alinhamento: 'foto-bloco',
+                    textoAlt: ''
                 };
 
                 await new Promise((resolve) => {
@@ -224,6 +264,7 @@
                     leitor.onload = function(e) {
                         componente.conteudo = e.target.result;
                         componentesObra.push(componente);
+                        contadorNormais++;
                         resolve();
                     };
                     
@@ -236,14 +277,17 @@
             }
             
             renderizarMesaDirecao();
-            alert(`${arquivos.length} arquivo(s) adicionado(s) com sucesso.`);
+            if(contadorNormais > 0) {
+                anunciarLeitor(`${contadorNormais} arquivo(s) adicionado(s) com sucesso.`);
+            }
+            uploadMultiplo.value = '';
         });
 
-        // Adiciona o texto que foi colado diretamente na caixa de texto
+        // Adiciona o texto que foi colado diretamente
         btnAdicionarTexto.addEventListener('click', function() {
             const conteudo = textoDireto.value;
             if (!conteudo.trim()) {
-                alert('A caixa de texto está vazia. Cole ou digite algo primeiro.');
+                anunciarLeitor('A caixa de texto está vazia. Digite algo primeiro.');
                 return;
             }
 
@@ -254,14 +298,15 @@
                 nome: `Texto Colado #${contadorTextosVirtuais}`,
                 tipo: 'texto',
                 conteudo: conteudo,
-                alinhamento: 'foto-bloco'
+                alinhamento: 'foto-bloco',
+                textoAlt: ''
             };
 
             componentesObra.push(novoComponente);
             textoDireto.value = '';
             
             renderizarMesaDirecao();
-            alert('Texto colado adicionado com sucesso ao Sumário abaixo!');
+            anunciarLeitor(`Texto colado número ${contadorTextosVirtuais} adicionado.`);
         });
 
         // Desenha a interface da lista com os botões de controle acessíveis
@@ -276,27 +321,31 @@
             componentesObra.forEach((comp, index) => {
                 const li = document.createElement('li');
                 li.className = `item-componente ${comp.tipo === 'imagem' ? 'tipo-imagem' : ''}`;
+                li.id = `item-id-${comp.id}`;
                 
                 const tipoTexto = comp.tipo === 'imagem' ? 'Imagem' : 'Texto do Capítulo';
                 
                 let HTMLControlesAdicionais = '';
                 if (comp.tipo === 'imagem') {
                     HTMLControlesAdicionais = `
-                        <label for="alinhar-${comp.id}" style="font-size:0.8rem; margin-top:8px;">Posição da Foto:</label>
+                        <label for="alinhar-${comp.id}" style="font-size:0.8rem; margin-top:8px;">Posição da Foto ${comp.nome}:</label>
                         <select id="alinhar-${comp.id}" onchange="atualizarAlinhamento('${comp.id}', this.value)">
                             <option value="foto-bloco" ${comp.alinhamento === 'foto-bloco' ? 'selected' : ''}>Bloco Inteiro (Centralizado)</option>
-                            <option value="foto-esquerda" ${comp.alinhamento === 'foto-esquerda' ? 'selected' : ''}>Deslocar para a Esquerda (Texto contorna)</option>
-                            <option value="foto-direita" ${comp.alinhamento === 'foto-direita' ? 'selected' : ''}>Deslocar para a Direita (Texto contorna)</option>
+                            <option value="foto-esquerda" ${comp.alinhamento === 'foto-esquerda' ? 'selected' : ''}>Deslocar para a Esquerda</option>
+                            <option value="foto-direita" ${comp.alinhamento === 'foto-direita' ? 'selected' : ''}>Deslocar para a Direita</option>
                         </select>
+
+                        <label for="alt-${comp.id}" style="font-size:0.8rem; margin-top:8px;">Descrição de Acessibilidade (Texto Alt):</label>
+                        <input type="text" id="alt-${comp.id}" class="input-alt" value="${comp.textoAlt}" placeholder="O que aparece nesta imagem?" oninput="atualizarTextoAlt('${comp.id}', this.value)">
                     `;
                 }
 
                 li.innerHTML = `
-                    <span class="item-titulo">[${tipoTexto}] ${comp.nome}</span>
+                    <span class="item-titulo" id="txt-comp-${comp.id}">[${tipoTexto}] ${comp.nome}</span>
                     <div class="controles-item">
-                        <button onclick="moverItem(${index}, -1)" ${index === 0 ? 'disabled' : ''} aria-label="Mover ${comp.nome} para cima">Subir</button>
-                        <button onclick="moverItem(${index}, 1)" ${index === componentesObra.length - 1 ? 'disabled' : ''} aria-label="Mover ${comp.nome} para baixo">Descer</button>
-                        <button onclick="removerItem('${comp.id}')" style="background:#ff3333;" aria-label="Remover ${comp.nome}">Excluir</button>
+                        <button onclick="moverItem(${index}, -1)" ${index === 0 ? 'disabled' : ''} aria-describedby="txt-comp-${comp.id}">Subir</button>
+                        <button onclick="moverItem(${index}, 1)" ${index === componentesObra.length - 1 ? 'disabled' : ''} aria-describedby="txt-comp-${comp.id}">Descer</button>
+                        <button onclick="removerItem('${comp.id}', ${index})" style="background:#ff3333;" aria-describedby="txt-comp-${comp.id}">Excluir</button>
                     </div>
                     ${HTMLControlesAdicionais}
                 `;
@@ -313,20 +362,47 @@
             componentesObra[novoIndex] = temp;
             
             renderizarMesaDirecao();
+            anunciarLeitor(`Item movido para a posição ${novoIndex + 1}.`);
             
             setTimeout(() => {
-                listaElementos.children[novoIndex].querySelector('button').focus();
+                listaElementos.children[novoIndex].querySelectorAll('button')[direcao === -1 ? 0 : 1].focus();
             }, 50);
         };
 
-        window.removerItem = function(id) {
+        window.removerItem = function(id, indexAtual) {
+            const nomeRemovido = componentesObra[indexAtual].nome;
             componentesObra = componentesObra.filter(c => c.id !== id);
             renderizarMesaDirecao();
+            anunciarLeitor(`Item ${nomeRemovido} excluído.`);
+
+            setTimeout(() => {
+                if (componentesObra.length === 0) {
+                    document.getElementById('titulo-sumario').focus();
+                } else {
+                    const proximoIndexAlvo = indexAtual > 0 ? indexAtual - 1 : 0;
+                    listaElementos.children[proximoIndexAlvo].querySelector('button').focus();
+                }
+            }, 50);
+        };
+
+        window.limparMesaTrabalho = function() {
+            if (componentesObra.length === 0) return;
+            if (confirm("Deseja realmente limpar toda a sua mesa de trabalho? Dados não salvos serão perdidos.")) {
+                componentesObra = [];
+                contadorTextosVirtuais = 0;
+                renderizarMesaDirecao();
+                anunciarLeitor("Mesa de trabalho totalmente limpa.");
+            }
         };
 
         window.atualizarAlinhamento = function(id, valor) {
             const comp = componentesObra.find(c => c.id === id);
             if (comp) comp.alinhamento = valor;
+        };
+
+        window.atualizarTextoAlt = function(id, valor) {
+            const comp = componentesObra.find(c => c.id === id);
+            if (comp) comp.textoAlt = valor;
         };
 
         // Monta a estrutura da obra para exibição em tela de impressão
@@ -335,23 +411,55 @@
             const containerObra = document.createElement('div');
             containerObra.className = templateEscolhido;
 
+            // Extração de títulos dinâmicos para a página de Índice do PDF
+            let titulosEncontrados = [];
+            
+            componentesObra.forEach(comp => {
+                if (comp.tipo === 'texto') {
+                    comp.conteudo.split('\n').forEach(lin => {
+                        if (lin.trim().startsWith('#')) {
+                            titulosEncontrados.push(lin.trim().replace(/^#\s*/, ''));
+                        }
+                    });
+                }
+            });
+
+            // Se o usuário ativou a opção de Sumário Automático
+            if (ajusteSumarioPdf.value === 'sim' && titulosEncontrados.length > 0) {
+                const blocoSumario = document.createElement('div');
+                blocoSumario.className = 'pdf-sumario';
+                let itensLista = '';
+                titulosEncontrados.forEach(tit => {
+                    itensLista += `<li><span>${tit}</span><span class="num-pag">...</span></li>`;
+                });
+                blocoSumario.innerHTML = `<h1>Sumário</h1><ul>${itensLista}</ul>`;
+                containerObra.appendChild(blocoSumario);
+            }
+
+            // Injeta os capítulos e mídias estruturadas
             componentesObra.forEach(comp => {
                 const bloco = document.createElement('div');
                 bloco.className = 'folha-capitulo';
 
                 if (comp.tipo === 'texto') {
-                    const paragrafos = comp.conteudo.split('\n').filter(p => p.trim() !== '');
+                    const linhas = comp.conteudo.split('\n');
                     let htmlFormatado = '';
                     
-                    paragrafos.forEach(p => {
-                        let textoLimpo = p.replace(/^-\s*/gm, '— ');
-                        htmlFormatado += `<p>${textoLimpo}</p>`;
+                    linhas.forEach(linha => {
+                        let l = linha.trim();
+                        if (l === '') return;
+
+                        if (l.startsWith('#')) {
+                            htmlFormatado += `<h2>${l.replace(/^#\s*/, '')}</h2>`;
+                        } else {
+                            htmlFormatado += `<p>${l.replace(/^-\s*/gm, '— ')}</p>`;
+                        }
                     });
                     
                     bloco.innerHTML = `<div class="bloco-texto">${htmlFormatado}</div>`;
                 } else if (comp.tipo === 'imagem') {
                     bloco.innerHTML = `
-                        <img src="${comp.conteudo}" class="${comp.alinhamento}" alt="Ilustração inserida pelo autor">
+                        <img src="${comp.conteudo}" class="${comp.alinhamento}" alt="${comp.textoAlt || 'Ilustração do autor'}">
                         <div class="limpar-fluxo"></div>
                     `;
                 }
@@ -363,18 +471,17 @@
         // Compila para a tela de impressão do PDF nativo
         btnCompilar.addEventListener('click', function() {
             if (componentesObra.length === 0) {
-                alert('Sua obra está vazia! Adicione capítulos ou imagens primeiro.');
+                anunciarLeitor('Sua mesa está vazia! Adicione conteúdos primeiro.');
                 return;
             }
 
             const tamanhoFonte = ajusteFonte.value;
             const tamanhoPapel = ajustePapel.value;
-            const corTexto = ajusteCor.value;
 
             estiloImpressaoDinamico.innerHTML = `
                 @media print {
                     @page { size: ${tamanhoPapel}; margin: 20mm; }
-                    #area-impressao div { font-size: ${tamanhoFonte} !important; color: ${corTexto} !important; }
+                    #area-impressao div, #area-impressao p, #area-impressao h2, #area-impressao li { font-size: ${tamanhoFonte} !important; color: #000000 !important; }
                 }
             `;
 
@@ -383,10 +490,10 @@
             window.print();
         });
 
-        // Função "Salvar Como..." Unificada
+        // Função "Salvar Como..." Unificada com Suporte a JSON Backup
         btnExportarArquivo.addEventListener('click', function() {
             if (componentesObra.length === 0) {
-                alert('Adicione algum conteúdo antes de salvar.');
+                anunciarLeitor('Adicione algum conteúdo antes de salvar.');
                 return;
             }
 
@@ -397,55 +504,46 @@
 
             if (formato === 'txt') {
                 componentesObra.forEach(comp => {
-                    if (comp.tipo === 'texto') {
-                        dadosSaida += `${comp.conteudo}\n\n`;
-                    } else {
-                        dadosSaida += `[Imagem Omitida no TXT: ${comp.nome}]\n\n`;
-                    }
+                    if (comp.tipo === 'texto') dadosSaida += `${comp.conteudo}\n\n`;
                 });
             } else if (formato === 'md') {
                 extensao = 'md';
                 componentesObra.forEach(comp => {
-                    if (comp.tipo === 'texto') {
-                        dadosSaida += `## ${comp.nome.split('.')[0]}\n\n${comp.conteudo}\n\n`;
-                    } else {
-                        dadosSaida += `![${comp.nome}](Imagem Embutida Omitida no Markdown)\n\n`;
-                    }
+                    if (comp.tipo === 'texto') dadosSaida += `## ${comp.nome.split('.')[0]}\n\n${comp.conteudo}\n\n`;
                 });
+            } else if (formato === 'json') {
+                extensao = 'json';
+                tipoMime = 'application/json';
+                dadosSaida = JSON.stringify(componentesObra);
             } else if (formato === 'html') {
                 extensao = 'html';
                 tipoMime = 'text/html';
-                
                 const estilosAtuais = document.getElementsByTagName('style')[0].innerHTML;
-                const corpoConteudo = construirHTMLObra().innerHTML;
-                
                 dadosSaida = `
                     <!DOCTYPE html>
                     <html lang="pt-BR">
                     <head>
                         <meta charset="UTF-8">
-                        <title>Obra Exportada - Manuscrito</title>
+                        <title>Obra Exportada</title>
                         <style>
                             body { padding: 40px; background: #fff; color: #000; font-family: sans-serif; }
                             .folha-capitulo { margin-bottom: 50px; border-bottom: 1px dashed #ccc; padding-bottom: 30px; }
                             ${estilosAtuais.split('@media print')[1] || ''}
                         </style>
                     </head>
-                    <body>
-                        ${corpoConteudo}
-                    </body>
-                    </html>
-                `;
+                    <body>${construirHTMLObra().innerHTML}</body>
+                    </html>`;
             }
 
             const blob = new Blob([dadosSaida], { type: `${tipoMime};charset=utf-8` });
             const linkVirtual = document.createElement('a');
             linkVirtual.href = URL.createObjectURL(blob);
-            linkVirtual.download = `obra_consolidada.${extensao}`;
+            linkVirtual.download = formato === 'json' ? 'manuscrito_backup.json' : `obra_consolidada.${extensao}`;
             
             document.body.appendChild(linkVirtual);
             linkVirtual.click();
             document.body.removeChild(linkVirtual);
+            anunciarLeitor(`Arquivo salvo com sucesso.`);
         });
     </script>
 </body>
